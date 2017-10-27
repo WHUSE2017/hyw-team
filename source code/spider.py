@@ -8,6 +8,7 @@ from selenium.webdriver.common.keys import Keys
 import urllib
 import time
 import os
+from handleJson import *
 import sys
 reload(sys)
 sys.setdefaultencoding("utf-8")
@@ -28,29 +29,31 @@ def iqiyi_replaceBlank(str):
 
 
 def connection(address):
-    # dcap = dict(DesiredCapabilities.PHANTOMJS)
-    # dcap["phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0"
+    dcap = dict(DesiredCapabilities.PHANTOMJS)
+    dcap["phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0"
     # 不载入图片，爬页面速度会快很多
-    # dcap["phantomjs.page.settings.loadImages"] = False
-    chromedriver = "C:/Program Files (x86)/Google/Chrome/Application/chromedriver.exe"
-    os.environ["webdriver.chrome.driver"] = chromedriver
+    dcap["phantomjs.page.settings.loadImages"] = False
+    # chromedriver = "C:/Program Files (x86)/Google/Chrome/Application/chromedriver.exe"
+    # os.environ["webdriver.chrome.driver"] = chromedriver
 
-    # driver = webdriver.PhantomJS(
-    #     executable_path=".\phantomjs.exe", service_args=['--ignore-ssl-errors=true', '--ssl-protocol=TLSv1'], desired_capabilities=dcap)
-    driver = webdriver.Chrome(chromedriver)
+    driver = webdriver.PhantomJS(
+        executable_path="..\phantomjs.exe", service_args=['--ignore-ssl-errors=true', '--ssl-protocol=TLSv1'], desired_capabilities=dcap)
+    # driver = webdriver.Chrome(chromedriver)
     driver.maximize_window()
     driver.get(address)
     return driver
 
 
 def search_bilibili(address, content):
+    raw_content=content
     content = Bilibili_replaceBlank(content)
     address = address + '/all?keyword=' + content
     driver = connection(address)
-    print driver.current_url
+    # print driver.current_url
     try:
         element1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.XPATH, "/html/body/div[5]/div[3]/div/li/ul/a")))
+        url=element1.get_attribute('href')
         element1.click()
     except:
         driver.quit()
@@ -66,9 +69,13 @@ def search_bilibili(address, content):
             li_lists = driver.find_elements(By.CLASS_NAME, "v1-short-text")
         else:
             li_lists = driver.find_elements(By.CLASS_NAME, "v1-complete-text")
+        updatetime=driver.find_element(By.XPATH,"/html/body/div[2]/div/div[1]/div/div[2]/div/div[2]/div[3]/em/span[2]")
+        updatetime=updatetime.text.split(' ')[1]
+
     except:
-    	driver.quit()
-    print len(li_lists)
+        driver.quit()
+    # print len(li_lists)
+    updateSubscribeList(raw_content,url,len(li_lists),updatetime)
     driver.quit()
 
 

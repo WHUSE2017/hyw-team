@@ -7,11 +7,16 @@ sys.setdefaultencoding("utf-8")
 
 
 def readFile():
-    cpath = os.getcwd()  # 获取当前工作目录
+    cpath = os.path.dirname(os.getcwd())  # 获取当前工作目录的上一级目录
     fpath = cpath + '/cache' + '/subscribe.json'
     if os.path.exists(fpath):  # 判断文件是否存在
         f = open(fpath)
         content = f.read()
+        #测试打印json文件内容
+        # lists=json.loads(content)['list']
+        # for i in lists:
+        #     for k in i:
+        #         print i[k]
         f.close()
         return content
     else:
@@ -21,7 +26,7 @@ def readFile():
 
 
 def writeFile(content):
-    cpath = os.getcwd()
+    cpath = os.path.dirname(os.getcwd())
     fpath = cpath + '/cache' + '/subscribe.json'
     f = open(fpath, 'w')
     f.write(content)
@@ -58,7 +63,7 @@ def deleateSubscribeList(name):
     subscribe_list['total'] -= 1
     writeFile(json.dumps(subscribe_list))
 
-updateSubscribeList('abc','www.baidu.com',5,'Monday')
+# updateSubscribeList('abc','www.baidu.com',5,'Monday')
+# deleateSubscribeList('abc')
 
-
-
+readFile()
