@@ -64,17 +64,16 @@ def updateSubscribeList(name, address, lastEpisode, updatetime):
 
 def deleateSubscribeList(name):
     if not judgeSubscribeList():
-        print 1
         return
     index = 0
     content=readFile()
     subscribe=json.loads(content)
     subscribe_list=subscribe['list']
     for i in range(len(subscribe_list)):
-        if name in subscribe_list[i]:
+        if name==subscribe_list[i]['name']:
             index = i
             break
-    if index!=0:
+    if index !=0:
         del subscribe_list[index]
         subscribe['total'] -= 1
         writeFile(json.dumps(subscribe))
@@ -109,4 +108,4 @@ def updateLastEpisode(episodes):
 
 # updateSubscribeList('abc','www.baidu.com',5,'Monday')
 # deleateSubscribeList('abc')
-deleateSubscribeList(u'狐妖小红娘')
+#deleateSubscribeList(u'宝石之国')

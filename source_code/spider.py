@@ -54,6 +54,7 @@ def search_bilibili(content):
         element1 = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
             (By.XPATH, "/html/body/div[5]/div[3]/div/li/ul/a")))
         url = element1.get_attribute('href')
+        print url
         element1.click()
     except:
         # driver.quit()
@@ -61,22 +62,24 @@ def search_bilibili(content):
         return
     handles = driver.window_handles
     driver.switch_to_window(handles[1])
+    print 1
+    element2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
+        (By.XPATH, "/html/body/div[2]/div/div[2]/div/div[2]/div[2]/div[1]/div/div[3]/ul")))
     try:
-        element2 = WebDriverWait(driver, 10).until(EC.presence_of_element_located(
-            (By.XPATH, "/html/body/div[2]/div/div[2]/div/div[2]/div[2]/div[1]/div/div[3]/ul")))
         if driver.find_element(By.XPATH, "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/ul/li[2]"):
             driver.find_element(
                 By.XPATH, "/html/body/div[2]/div/div[2]/div/div[2]/div[1]/ul/li[2]").click()
             li_lists = driver.find_elements(By.CLASS_NAME, "v1-short-text")
         else:
             li_lists = driver.find_elements(By.CLASS_NAME, "v1-complete-text")
-        updatetime = driver.find_element(
-            By.XPATH, "/html/body/div[2]/div/div[1]/div/div[2]/div/div[2]/div[3]/em/span[2]")
-        updatetime = updatetime.text.split(' ')[1]
-        updateSubscribeList(raw_content, url, len(li_lists), updatetime)
-        driver.quit()
     except:
-        driver.quit()
+        li_lists=driver.find_elements(By.CLASS_NAME,"v1-complete-text")
+        print li_lists
+    updatetime = driver.find_element(
+        By.XPATH, "/html/body/div[2]/div/div[1]/div/div[2]/div/div[2]/div[3]/em/span[2]")
+    updatetime = updatetime.text.split(' ')[1]
+    updateSubscribeList(raw_content, url, len(li_lists), updatetime)
+    driver.quit()
     # print len(li_lists)
     # updateSubscribeList(raw_content, url, len(li_lists), updatetime)
 
@@ -136,6 +139,10 @@ def getLastEpisode(url):
 if __name__ == '__main__':
     b_address = 'https://search.bilibili.com'
     i_address = 'http://so.iqiyi.com/so'
-    content = u'奇诺之旅 新作'
+    content = u'宝石之国'
     search_bilibili(content)#现在直接调用这个函数就可以搜索B站和爱奇艺了
     # getLastEpisode(getUrl())  #抓取更新集数
+    content = '十二大战'
+    content = content.encode('utf-8')
+    search_bilibili(content)#现在直接调用这个函数就可以搜索B站和爱奇艺了
+    search_bilibili(u'黑色五叶草')

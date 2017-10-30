@@ -8,6 +8,7 @@ Desktop.ini
 *.so
 *.egg
 *.egg-info
+*.log
 dist
 build
 
@@ -15,3 +16,4 @@ build
 db.ini
 deploy_key_rsa
 /GUI/.idea
+/.idea
