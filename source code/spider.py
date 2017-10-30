@@ -102,6 +102,9 @@ def search_iqiyi(driver, content):
 
 def getLastEpisode(url):
     print url
+    if not judgeSubscribeList():
+        print 'the list is empty'
+        return 
     episodes = []
     dcap = dict(DesiredCapabilities.PHANTOMJS)
     dcap["phantomjs.page.settings.userAgent"] = "Mozilla/5.0 (Macintosh; Intel Mac OS X 10.9; rv:25.0) Gecko/20100101 Firefox/25.0"
@@ -134,5 +137,5 @@ if __name__ == '__main__':
     b_address = 'https://search.bilibili.com'
     i_address = 'http://so.iqiyi.com/so'
     content = u'奇诺之旅 新作'
-    # search_bilibili(content)现在直接调用这个函数就可以搜索B站和爱奇艺了
-    getLastEpisode(getUrl())  #抓取更新集数
+    search_bilibili(content)#现在直接调用这个函数就可以搜索B站和爱奇艺了
+    # getLastEpisode(getUrl())  #抓取更新集数

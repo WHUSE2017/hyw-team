@@ -21,8 +21,13 @@ def readFile():
         return content
     else:
         f = open(fpath, 'w')  # 不存在就新建一个
+        subscribe_list = {
+            'list': [],
+            'total': 0
+        }
+        f.write(json.dumps(subscribe_list))
         f.close()
-        return 0
+        return json.dumps(subscribe_list)
 
 
 def writeFile(content):
@@ -33,20 +38,23 @@ def writeFile(content):
     f.close()
 
 
+def judgeSubscribeList():
+    content = readFile()
+    total = json.loads(content)['total']
+    if total == 0:
+        return False
+    else:
+        return True
+
+
 def updateSubscribeList(name, address, lastEpisode, updatetime):
     content = readFile()
-    if content:
-        subscribe_list = json.loads(content)
-        lists = subscribe_list['list']
-        for i in lists:
-            if i['name'] == name:
-                print 'the name is already in list'
-                return
-    else:
-        subscribe_list = {
-            'list': [],
-            'total': 0
-        }
+    subscribe_list = json.loads(content)
+    lists = subscribe_list['list']
+    for i in lists:
+        if i['name'] == name:
+            print 'the name is already in list'
+            return
     new_subscribe = {'name': name, 'address': address,
                      'lastEpisode': lastEpisode, 'updatetime': updatetime}
     subscribe_list['list'].append(new_subscribe)
@@ -55,25 +63,31 @@ def updateSubscribeList(name, address, lastEpisode, updatetime):
 
 
 def deleateSubscribeList(name):
-    content = readFile()
-    if content:
-        subscribe_list = json.loads(content)
-    list = subscribe_list['list']
+    if not judgeSubscribeList():
+        print 1
+        return
     index = 0
-    for i in range(len(list)):
-        if name in list[i]:
+    content=readFile()
+    subscribe=json.loads(content)
+    subscribe_list=subscribe['list']
+    for i in range(len(subscribe_list)):
+        if name in subscribe_list[i]:
             index = i
-    del list[index]
-    subscribe_list['list'] = list
-    subscribe_list['total'] -= 1
-    writeFile(json.dumps(subscribe_list))
+            break
+    if index!=0:
+        del subscribe_list[index]
+        subscribe['total'] -= 1
+        writeFile(json.dumps(subscribe))
+    else:
+        print 'the name is not existed'
 
 
 def getUrl():
     url = []
     content = readFile()
+    print type(content)
     subscribe_list = json.loads(content)
-    list=subscribe_list['list']
+    list = subscribe_list['list']
     for i in list:
         url.append(i['address'])
     print type(url)
@@ -83,6 +97,9 @@ def getUrl():
 def updateLastEpisode(episodes):
     content = readFile()
     subscribe_list = json.loads(content)
+    if subscribe_list:
+        print 'the list is empty'
+        return
     m = 0
     for i in subscribe_list['list']:
         i['lastEpisode'] = episodes[m]
@@ -92,3 +109,4 @@ def updateLastEpisode(episodes):
 
 # updateSubscribeList('abc','www.baidu.com',5,'Monday')
 # deleateSubscribeList('abc')
+deleateSubscribeList(u'狐妖小红娘')
