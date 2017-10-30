@@ -1,3 +1,10 @@
+# 使用方法
+
+打开AnimateSubscribe目录下AnimateSubscribe.exe
+
+
+
+
 # Update 10/25
 ## detail： 
 + 上传了基础爬虫文件spider.py
