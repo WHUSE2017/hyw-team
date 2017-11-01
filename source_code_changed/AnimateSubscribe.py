@@ -25,9 +25,24 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+class SearchThread(QtCore.QThread):
+    finishSignal = QtCore.pyqtSignal()
+    def __init__(self,args):
+        super(SearchThread,self).__init__()
+        self.args = args
+
+    def run(self):
+        subtext = str(self.args)
+        subtext = subtext.encode('utf-8')
+        search_bilibili(subtext)
+        self.finishSignal.emit()
+
 
 class Ui_Form(QtGui.QDialog):
     def setupUi(self, Form):
+        # 声明线程信号
+      #  self.thread1 = MyThread(str)
+
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(571, 442)
         self.searchbox = QtGui.QTextEdit(Form)
@@ -72,8 +87,6 @@ class Ui_Form(QtGui.QDialog):
         self.tableWidget.setColumnWidth(3, 85)
         self.tableWidget.setColumnWidth(4, 80)
 
-
-
     # 根据sublist.txt抓取信息存放在cache/json里
     def seek(self):
         #getLastEpisode(url)
@@ -101,13 +114,21 @@ class Ui_Form(QtGui.QDialog):
         with open("sublist.txt", mode="a") as data:
             data.write('\n')
             data.write(subtext)
+        self.subplupbt.setDisabled(True)
+        self.searchthread = SearchThread(subtext)
 
-        subtext = str(subtext)
-        subtext = subtext.encode('utf-8')
-        search_bilibili(subtext)
+        self.searchthread.finishSignal.connect(self.refreshUI)
+        self.searchthread.start()
+        # subtext = str(subtext)
+        # subtext = subtext.encode('utf-8')
+        # search_bilibili(subtext)
+        # self.tableWidget.clearContents()
+        # self.retranslateUi(Form)
+
+    def refreshUI(self):
         self.tableWidget.clearContents()
         self.retranslateUi(Form)
-
+        self.subplupbt.setDisabled(False)
 
 
     # table内添加数据
