@@ -2,6 +2,7 @@
 
 打开AnimateSubscribe目录下AnimateSubscribe.exe
 
+只能添加当季正版动画
 
 
 
