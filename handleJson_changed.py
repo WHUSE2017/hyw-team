@@ -47,7 +47,7 @@ def judgeSubscribeList():
         return True
 
 
-def updateSubscribeList(name, address, lastEpisode, updatetime):
+def updateSubscribeList(name, address, lastEpisode, sourceName):
     content = readFile()
     subscribe_list = json.loads(content)
     lists = subscribe_list['list']
@@ -56,7 +56,7 @@ def updateSubscribeList(name, address, lastEpisode, updatetime):
             print 'the name is already in list'
             return
     new_subscribe = {'name': name, 'address': address,
-                     'lastEpisode': lastEpisode, 'updatetime': updatetime}
+                     'lastEpisode': lastEpisode, 'sourceName': sourceName}
     subscribe_list['list'].append(new_subscribe)
     subscribe_list['total'] += 1
     writeFile(json.dumps(subscribe_list))
