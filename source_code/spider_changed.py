@@ -103,6 +103,7 @@ def Update():
     for i in subscribe_list:
         search_input.clear()
         search_input.send_keys(i['name'])
+        time.sleep(1)
         search_btn.click()
         time.sleep(1)
         i['last'], i['address'] = get_lastEpisode(driver)
