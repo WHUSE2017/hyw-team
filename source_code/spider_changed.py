@@ -74,9 +74,10 @@ def get_info(driver):
 
 def get_lastEpisode(driver):
     episodes = driver.find_elements(By.CLASS_NAME, "c-album-item")
+    print len(episodes)
     last = episodes[4].get_attribute('data-widget-ptype').split('-')[-1]
     address = episodes[4].get_attribute('href')
-    print last
+    # print last
     return (int(last), address)
 
 
@@ -101,6 +102,7 @@ def Update():
         search_input.clear()
         search_input.send_keys(i['name'])
         search_btn.click()
+        time.sleep(1)
         i['last'], i['address'] = get_lastEpisode(driver)
     content['list'] = subscribe_list
     writeFile(json.dumps(content))
@@ -109,5 +111,5 @@ def Update():
 
 # getinfo(u'银魂走光篇')
 # get_lastEpisode(search_aiqiyi(u'银魂走光篇'))
-# add_list(u'宝石之国')
+# add_list(u'十二大战')
 # Update()
