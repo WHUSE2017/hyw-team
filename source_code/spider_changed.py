@@ -73,6 +73,8 @@ def get_info(driver):
 
 
 def get_lastEpisode(driver):
+    if driver == 0:
+        return
     episodes = driver.find_elements(By.CLASS_NAME, "c-album-item")
     print len(episodes)
     last = episodes[4].get_attribute('data-widget-ptype').split('-')[-1]
