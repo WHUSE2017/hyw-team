@@ -5,7 +5,6 @@ from PyQt4.QtGui import *
 from simplejson import load
 from spider_changed import *
 
-
 reload(sys)
 sys.setdefaultencoding('utf-8')
 
@@ -27,15 +26,29 @@ except AttributeError:
 
 class SearchThread(QtCore.QThread):
     finishSignal = QtCore.pyqtSignal()
+    _signal = QtCore.pyqtSignal()
     def __init__(self,args):
         super(SearchThread,self).__init__()
         self.args = args
 
+
     def run(self):
         subtext = str(self.args)
         subtext = subtext.encode('utf-8')
-        add_list(subtext)
+        ans = add_list(subtext)
+        if ans == 'NoSuch':
+            print 'NoSuch'
+            self._signal.connect(self.mySignal)
+            self._signal.emit()
+
         self.finishSignal.emit()
+
+    def mySignal(self):
+        list_run = []
+        dilogUi = warningBox(u"搜索失败",u"请输入番剧的全名。如‘奇诺之旅 新作’",list_run)
+        if dilogUi.exec_():
+            return
+
 
 class SeekThread(QtCore.QThread):
     seekfinishSignal = QtCore.pyqtSignal()
@@ -75,10 +88,9 @@ class Ui_Form(QtGui.QDialog):
         Form.setWindowTitle(_translate("Form", "追番查询", None))
         self.subplupbt.setText(_translate("Form", "添加订阅", None))
         self.subplupbt.setFont(QtGui.QFont("Microsoft YaHei", 11))
-        #quit.setFont(QtGui.QFont("OldEnglish", 24))
         self.refreshpbt.setText(_translate("Form", "更新剧集", None))
         self.refreshpbt.setFont(QtGui.QFont("Microsoft YaHei", 11))
-        # 初始化表格p
+        # 初始化表格
         self.table_set()
         self.adddata()
 
@@ -97,7 +109,6 @@ class Ui_Form(QtGui.QDialog):
         self.tableWidget.setColumnWidth(3, 85)
         self.tableWidget.setColumnWidth(4, 80)
 
-    # 根据sublist.txt抓取信息存放在json里
     def seek(self):
         self.refreshpbt.setDisabled(True)
         self.seekthread = SeekThread('1')
@@ -107,10 +118,16 @@ class Ui_Form(QtGui.QDialog):
     # 添加订阅按钮
     def addsublist(self):
         subtext = self.searchbox.toPlainText()
-        self.subplupbt.setDisabled(True)
-        self.searchthread = SearchThread(subtext)
-        self.searchthread.finishSignal.connect(self.refreshUI)
-        self.searchthread.start()
+        if subtext == '':
+            list_run = []
+            dilogUi = warningBox(u"搜索失败", u"请输入番剧全名", list_run)
+            if dilogUi.exec_():
+                return
+        else:
+            self.subplupbt.setDisabled(True)
+            self.searchthread = SearchThread(subtext)
+            self.searchthread.finishSignal.connect(self.refreshUI)
+            self.searchthread.start()
 
     def refreshUI(self):
         self.tableWidget.clearContents()
@@ -165,6 +182,36 @@ class Ui_Form(QtGui.QDialog):
         deleateSubscribeList(id)
         self.tableWidget.clearContents()
         self.retranslateUi(Form)
+
+class warningBox(QDialog):
+    def __init__(self,str_title,str_text,list_bool):#####自己写一个warningbox
+        super(warningBox,self).__init__(parent = None)
+        self.return_value = list_bool
+        self.setWindowTitle(str_title)
+        self.mainlayout = QGridLayout(self)
+        self.labelText = QLabel()
+        self.setFont(QtGui.QFont("Microsoft YaHei", 11))#####字体设置
+        self.mainlayout.addWidget(self.labelText,0,0,1,10)
+        self.labelText.setText(str_text)
+        self.resize(400,100)
+        self.buttonSure = QPushButton()
+        self.buttonSure.setText(u"确定" )
+        self.buttonCancel = QPushButton()
+        self.buttonCancel.setText(u"取消" )
+        self.mainlayout.addWidget(self.buttonSure,1,2,1,2)
+        self.mainlayout.addWidget(self.buttonCancel,1,6,1,2)
+        self.setLayout(self.mainlayout)
+        self.buttonSure.clicked.connect(self.sureOpra)
+        self.buttonCancel.clicked.connect(self.cancelOpra)
+        self.show()
+
+    def sureOpra(self):
+        self.close()
+        self.return_value.append(1)
+
+    def cancelOpra(self):
+        self.close()
+        self.return_value.append(0)
 
 if __name__ == "__main__":
     import sys

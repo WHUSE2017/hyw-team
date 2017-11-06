@@ -56,8 +56,8 @@ def search_aiqiyi(content):
         except:
             print 'have no results'
             driver.quit()
-            return 0
-
+  ###          return 0
+            return 'NoSuch'
 
 def get_info(driver):
     if driver == 0:
@@ -87,6 +87,11 @@ def add_list(name):
     raw_content = readFile()
     content = json.loads(raw_content)
     driver=search_aiqiyi(name)
+
+    # 新添加
+    if driver == 'NoSuch':
+        return 'NoSuch'
+
     sourcename=get_info(driver)
     last,address=get_lastEpisode(driver)
     updateSubscribeList(name,address,last,sourcename)
@@ -103,9 +108,9 @@ def Update():
     for i in subscribe_list:
         search_input.clear()
         search_input.send_keys(i['name'])
-        time.sleep(1)
+        time.sleep(0.5)
         search_btn.click()
-        time.sleep(1)
+        time.sleep(0.5)
         i['last'], i['address'] = get_lastEpisode(driver)
     content['list'] = subscribe_list
     writeFile(json.dumps(content))
