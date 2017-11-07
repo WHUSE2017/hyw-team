@@ -24,6 +24,8 @@ except AttributeError:
     def _translate(context, text, disambig):
         return QtGui.QApplication.translate(context, text, disambig)
 
+
+# 搜索线程
 class SearchThread(QtCore.QThread):
     finishSignal = QtCore.pyqtSignal()
     _signal = QtCore.pyqtSignal()
@@ -36,6 +38,7 @@ class SearchThread(QtCore.QThread):
         subtext = str(self.args)
         subtext = subtext.encode('utf-8')
         ans = add_list(subtext)
+        # 判断搜索框为空
         if ans == 'NoSuch':
             print 'NoSuch'
             self._signal.connect(self.mySignal)
@@ -43,13 +46,14 @@ class SearchThread(QtCore.QThread):
 
         self.finishSignal.emit()
 
+    # 弹出警告框
     def mySignal(self):
         list_run = []
         dilogUi = warningBox(u"搜索失败",u"请输入番剧的全名。如‘奇诺之旅 新作’",list_run)
         if dilogUi.exec_():
             return
 
-
+# 更新线程
 class SeekThread(QtCore.QThread):
     seekfinishSignal = QtCore.pyqtSignal()
     def __init__(self,args):
@@ -66,17 +70,22 @@ class Ui_Form(QtGui.QDialog):
 
         Form.setObjectName(_fromUtf8("Form"))
         Form.resize(571, 442)
+        # 搜索框
         self.searchbox = QtGui.QTextEdit(Form)
         self.searchbox.setGeometry(QtCore.QRect(20, 20, 371, 41))
         self.searchbox.setFont(QtGui.QFont("Microsoft YaHei", 12))
         self.searchbox.setObjectName(_fromUtf8("searchbox"))
+        # 添加订阅按钮
         self.subplupbt = QtGui.QPushButton(Form)
         self.subplupbt.setGeometry(QtCore.QRect(400, 20, 71, 41))
         self.subplupbt.setObjectName(_fromUtf8("subplupbt"))
+        
+        # 更新按钮
         self.refreshpbt = QtGui.QPushButton(Form)
         self.refreshpbt.setGeometry(QtCore.QRect(480, 20, 71, 41))
         self.refreshpbt.setObjectName(_fromUtf8("refreshpbt"))
 
+        # 数据表格
         self.tableWidget = QtGui.QTableWidget(Form)
         self.tableWidget.setGeometry(QtCore.QRect(20, 80, 531, 321))
 
@@ -95,7 +104,6 @@ class Ui_Form(QtGui.QDialog):
         self.adddata()
 
     def table_set(self):
-
         # 设置表格属性：
         self.tableWidget.setEditTriggers(QAbstractItemView.NoEditTriggers)
         self.tableWidget.setColumnCount(5)
@@ -109,6 +117,7 @@ class Ui_Form(QtGui.QDialog):
         self.tableWidget.setColumnWidth(3, 85)
         self.tableWidget.setColumnWidth(4, 80)
 
+    # 更新操作
     def seek(self):
         self.refreshpbt.setDisabled(True)
         self.seekthread = SeekThread('1')
@@ -129,16 +138,16 @@ class Ui_Form(QtGui.QDialog):
             self.searchthread.finishSignal.connect(self.refreshUI)
             self.searchthread.start()
 
+    # 刷新表格内容
     def refreshUI(self):
         self.tableWidget.clearContents()
         self.retranslateUi(Form)
         self.subplupbt.setDisabled(False)
         self.refreshpbt.setDisabled(False)
 
-    # table内添加数据
+    # 表格内添加数据
     def adddata(self):
-
-        content  = readFile()
+        content  = readFile()# 防止不存在subscribe.json
         with open("subscribe.json", "r") as dump_f:
             temp = load(dump_f)
             temp_num = temp['total']
@@ -156,7 +165,7 @@ class Ui_Form(QtGui.QDialog):
             version = QLabel(strrr, self)
             version.setOpenExternalLinks(True)
             self.tableWidget.setCellWidget(row_number, 3, version)
-            self.tableWidget.setCellWidget(row_number, 4, self.buttonForRow(row_number))
+            self.tableWidget.setCellWidget(row_number, 4, self.buttonForRow(row_number))# 传入行数
 
     def buttonForRow(self,id):
         widget=QWidget()
@@ -170,13 +179,13 @@ class Ui_Form(QtGui.QDialog):
                                     font : 13px; ''')
 
         deleteBtn.clicked.connect(lambda:self.removeLine(id))
-
         hLayout = QHBoxLayout()
         hLayout.addWidget(deleteBtn)
         hLayout.setContentsMargins(5,2,5,2)
         widget.setLayout(hLayout)
         return widget
 
+    # 从json中删除对应行
     def removeLine(self, id):
         print (id)
         deleateSubscribeList(id)
